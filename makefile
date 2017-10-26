@@ -6,14 +6,14 @@
 #    By: chle-van <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/05/27 20:46:24 by chle-van          #+#    #+#              #
-#    Updated: 2017/10/23 14:37:50 by chle-van         ###   ########.fr        #
+#    Updated: 2017/10/26 23:01:12 by chle-van         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 LIB_PATH=./libft/
 CC=gcc
-CFLAGS=-Wall -Wextra -Werror -g
-CLIB=-lmlx #-lXext# -lX11
+CFLAGS=-Wall -Wextra -Werror -g 
+CLIB=-lmlx
 CFRAMWORKS=-framework OpenGL -framework Appkit
 SRC=fdf.c\
 	main.c\

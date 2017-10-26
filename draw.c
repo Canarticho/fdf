@@ -6,64 +6,82 @@
 /*   By: chle-van <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/10/23 12:59:40 by chle-van          #+#    #+#             */
-/*   Updated: 2017/10/23 21:08:40 by chle-van         ###   ########.fr       */
+/*   Updated: 2017/10/26 23:52:03 by chle-van         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
-void ft_writepix(t_fdf *fdf, int x, int y)
+void		ft_writepix(t_fdf *fdf, int x, int y, int z)
 {
-	if (x > 0 && y > 0 && x < WID && y < LEN)
-	{
-		fdf->data[x * 4 + y * WID + 1] = fdf->r;
-		fdf->data[x * 4 + y * WID + 2] = fdf->g;
-		fdf->data[x * 4 + y * WID + 3] = fdf->b;
-	}
+	static int i;
+	static int j;
+
+	if (!(i == x && j == y) || (x == 0 && y == 0))
+		if (x >= 0 && y >= 0 && x < WID && y < LEN)
+		{
+			if (z >= 0)
+			{
+				fdf->data[4 * (x + (y * WID)) + 0] = fdf->b;
+				fdf->data[4 * (x + (y * WID)) + 1] = fdf->g;
+				fdf->data[4 * (x + (y * WID)) + 2] = fdf->r;
+			}
+			else
+			{
+				fdf->data[4 * (x + (y * WID)) + 0] = 0xff;
+				fdf->data[4 * (x + (y * WID)) + 1] = 0;
+				fdf->data[4 * (x + (y * WID)) + 2] = 0;
+			}
+		}
+	i = x;
+	j = y;
 }
 
-void		ft_draw_line(t_fdf *fdf)
-{		
-	double hyp;
-	double x;
-	double y;
+void		ft_draw_line(t_fdf *fdf, int z)
+{
+	double	x;
+	double	y;
+	int		i;
 
+	i = LINERES;
 	fdf->dy = fdf->y1 - fdf->y;
 	fdf->dx = fdf->x1 - fdf->x;
 	x = fdf->x;
 	y = fdf->y;
-	hyp = sqrt((fdf->dx * fdf->dx) + (fdf->dy * fdf->dy));
-	fdf->dx /= hyp;
-	fdf->dy /= hyp;
-	while (hyp >= 0)
+	fdf->dx /= i;
+	fdf->dy /= i;
+	while (i >= 0)
 	{
-		ft_writepix(fdf, x, y);
+		ft_writepix(fdf, x, y, z);
 		x += fdf->dx;
 		y += fdf->dy;
-		hyp--;
+		i--;
 	}
 }
 
-void		ft_applyx(t_fdf *fdf, int x, int y)
+void		ft_apply(t_fdf *f, int x, int y, char axis)
 {
-	fdf->x = fdf->xm + fdf->tx + fdf->zoom * (x * cos(fdf->arad) + y * sin(fdf->arad));
-	fdf->y = fdf->ym + fdf->ty + fdf->zoom * (sin(fdf->brad) * (x * sin(fdf->arad) - y * cos(fdf->arad)) + 
-			fdf->map[y][x] * cos (fdf->brad));
-	fdf->x1 = fdf->xm + fdf->tx + fdf->zoom * ((x + 1) * cos(fdf->arad) + y * sin(fdf->arad));
-	fdf->y1 = fdf->ym + fdf->ty + fdf->zoom * (sin(fdf->brad) * ((x + 1) * sin(fdf->arad) - 
-				y * cos(fdf->arad)) + fdf->map[y][x + 1] * cos(fdf->brad));
-	ft_draw_line(fdf);
-}
-
-void		ft_applyy(t_fdf *fdf,int x,int y)
-{
-	fdf->x = fdf->xm + fdf->tx + fdf->zoom * (x * cos(fdf->arad) + y * sin(fdf->arad));
-	fdf->y = fdf->ym + fdf->ty + fdf->zoom * (sin(fdf->brad) * (x * sin(fdf->arad) - y * cos(fdf->arad)) + 
-			fdf->map[y][x] * cos(fdf->brad));
-	fdf->x1 = fdf->xm + fdf->tx + fdf->zoom * ((x) * cos(fdf->arad) + (y + 1) * sin(fdf->arad));
-	fdf->y1 = fdf->ym + fdf->ty + fdf->zoom * (sin(fdf->brad) * ((x) * sin(fdf->arad) - 
-				(y + 1) * cos(fdf->arad)) + fdf->map[y + 1][x] * cos(fdf->brad));
-	ft_draw_line(fdf);
+	f->x = f->xm + f->tx + f->zoom * (x * f->a1 + y * f->a2);
+	f->y = f->ym + f->ty + f->zoom * (f->b2 * (x * f->a2 - y * f->a1) -
+			(f->map[y][x] + f->tz) * f->b1);
+	if (!(axis & NOLINE))
+	{
+		if (axis & YD)
+		{
+			f->x1 = f->xm + f->tx + f->zoom * (x * f->a1 + (y + 1) * f->a2);
+			f->y1 = f->ym + f->ty + f->zoom * (f->b2 * (x * f->a2 -
+						(y + 1) * f->a1) - (f->map[y + 1][x] + f->tz) * f->b1);
+		}
+		else if (axis & XD)
+		{
+			f->x1 = f->xm + f->tx + f->zoom * ((x + 1) * f->a1 + y * f->a2);
+			f->y1 = f->ym + f->ty + f->zoom * (f->b2 * ((x + 1) * f->a2 -
+						y * f->a1) - (f->map[y][x + 1] + f->tz) * f->b1);
+		}
+		ft_draw_line(f, f->map[y][x]);
+	}
+	else
+		ft_writepix(f, f->x, f->y, f->map[y][x]);
 }
 
 void		ft_create_image(t_fdf *fdf, char flag)
@@ -72,39 +90,39 @@ void		ft_create_image(t_fdf *fdf, char flag)
 	int size;
 	int endi;
 
-	if (flag == CREATE)
-	{
-		fdf->img = mlx_new_image(fdf->mlx, 1600, 1050);
-		fdf->data = mlx_get_data_addr(fdf->img, &bpp, &size, &endi);
-	}
+	if (flag == RAZ)
+		ft_bzero(fdf->data, 4 * WID * LEN);
 	else if (flag == APPLY)
+		mlx_put_image_to_window(fdf->mlx, fdf->win, fdf->img, 0, 0);
+	else if (flag == CREATE)
 	{
-		mlx_put_image_to_window(fdf->mlx, fdf->win, fdf->img, 0 ,0);
-		mlx_destroy_image(fdf->mlx, fdf->img);
+		fdf->img = mlx_new_image(fdf->mlx, WID, LEN);
+		fdf->data = mlx_get_data_addr(fdf->img, &bpp, &size, &endi);
 	}
 }
 
-int		ft_draw(t_fdf *fdf)
+int			ft_draw(t_fdf *fdf)
 {
 	int x;
 	int y;
 
-	x = 0;
-	y = 0;
-	ft_create_image(fdf, CREATE);
-	while (y < fdf->ymax)
+	y = -1;
+	fdf->a1 = cos(fdf->arad);
+	fdf->a2 = sin(fdf->arad);
+	fdf->b1 = cos(fdf->brad);
+	fdf->b2 = sin(fdf->brad);
+	ft_create_image(fdf, RAZ);
+	while (++y < fdf->ymax)
 	{
-		while (x < fdf->xmax)
+		x = -1;
+		while (++x < fdf->xmax)
 		{
 			if (x < fdf->xmax - 1)
-				ft_applyx(fdf, x, y);
+				ft_apply(fdf, x, y, fdf->pt + XD);
 			if (y < fdf->ymax - 1)
-				ft_applyy(fdf, x, y);
-					x++;
+				ft_apply(fdf, x, y, fdf->pt + YD);
 		}
-		x = 0;
-		y++;
 	}
 	ft_create_image(fdf, APPLY);
 	return (0);
-
+}
