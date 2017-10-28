@@ -6,7 +6,7 @@
 /*   By: chle-van <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/10/23 13:01:09 by chle-van          #+#    #+#             */
-/*   Updated: 2017/10/26 23:07:36 by chle-van         ###   ########.fr       */
+/*   Updated: 2017/10/28 20:43:25 by chle-van         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,9 @@ void	ft_zoom(int keycode, t_fdf *fdf)
 {
 	if (keycode == PLUS || (keycode == MINUS && fdf->zoom > ZC))
 		fdf->zoom = (keycode == PLUS) ? (fdf->zoom + ZC) : (fdf->zoom - ZC);
-	else if (keycode == F1 && !fdf->pt)
+	else if (keycode == TILD && !fdf->pt)
 		fdf->pt = NOLINE;
-	else if (keycode == F1 && fdf->pt)
+	else if (keycode == TILD && fdf->pt)
 		fdf->pt = 0;
 }
 
@@ -63,7 +63,7 @@ int		ft_keypress(int keycode, t_fdf *fdf)
 	else if (keycode == HAUT || keycode == BAS || keycode == DROITE ||
 			keycode == GAUCHE)
 		ft_rotate(keycode, fdf);
-	else if (keycode == PLUS || keycode == MINUS || keycode == F1)
+	else if (keycode == PLUS || keycode == MINUS || keycode == TILD)
 		ft_zoom(keycode, fdf);
 	return (0);
 }

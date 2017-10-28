@@ -6,7 +6,7 @@
 /*   By: chle-van <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/10/23 11:03:46 by chle-van          #+#    #+#             */
-/*   Updated: 2017/10/26 21:20:56 by chle-van         ###   ########.fr       */
+/*   Updated: 2017/10/28 19:45:34 by chle-van         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 # define R 15
 # define F 3
 # define F1 122
+# define TILD 50
 # define HAUT 126
 # define BAS 125
 # define DROITE 124

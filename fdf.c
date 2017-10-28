@@ -6,7 +6,7 @@
 /*   By: chle-van <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/10/23 11:17:07 by chle-van          #+#    #+#             */
-/*   Updated: 2017/10/26 23:46:55 by chle-van         ###   ########.fr       */
+/*   Updated: 2017/10/28 20:16:21 by chle-van         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,6 @@ int				ft_check(int fd, t_fdf *fdf)
 	int		i;
 	char	c;
 
-	line = NULL;
 	fdf->xmax = 0;
 	fdf->ymax = 0;
 	while ((c = ft_gnl(fd, &line)) > 0)
@@ -88,7 +87,7 @@ int				ft_check(int fd, t_fdf *fdf)
 		}
 		else
 			return (-1);
-		free(line);
+		ft_strdel(&line);
 	}
 	if (c == 0 && fdf->xmax && fdf->ymax)
 		return (1);
@@ -109,7 +108,14 @@ int				ft_getmap(char *filename, t_fdf *fdf)
 	if (!ft_createmap(fd, fdf))
 		return (ERR_CMAP);
 	else
-		ft_putstr("Map cree\n");
+	{
+		ft_putstr("Map cree [");
+		ft_putnbr(fdf->xmax);
+		ft_putstr(" ; ");
+		ft_putnbr(fdf->ymax);
+		ft_putstr("]\n");
+	}
+	close(fd);
 	return (0);
 }
 
